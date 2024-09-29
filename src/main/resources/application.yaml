@@ -1,3 +1,13 @@
 spring:
   application:
     name: backend
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    url: ${DB_URL}
+
+  jwt:
+    secret: ${JWT_SECRET}
+    expire: 60

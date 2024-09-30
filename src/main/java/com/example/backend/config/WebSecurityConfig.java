@@ -3,6 +3,7 @@ package com.example.backend.config;
 import com.example.backend.domain.vo.response.RestBean;
 import com.example.backend.filter.JWTFilter;
 import com.example.backend.service.AuthorizeService;
+import com.example.backend.util.JWTUtil;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,6 +19,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 
@@ -29,6 +31,8 @@ public class WebSecurityConfig {
     AuthorizeService authorizeService;
     @Resource
     JWTFilter jwtFilter;
+    @Resource
+    JWTUtil jwtUtil;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -50,6 +54,7 @@ public class WebSecurityConfig {
                 .logout(conf -> {
                     conf
                             .logoutUrl("/api/auth/logout")
+                            .addLogoutHandler(this::logoutHandler)
                             .logoutSuccessHandler(this::onLogoutSuccess);
                 })
                 //异常处理
@@ -83,5 +88,13 @@ public class WebSecurityConfig {
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         response.setContentType("application/json;charset=utf-8");
         response.getWriter().write(RestBean.success().asJsonString());
+    }
+
+    public void logoutHandler(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+        //吊销JWT令牌
+        String jwtToken = request.getHeader("Authorization");
+        if (StringUtils.hasText(jwtToken)) {
+            jwtUtil.revokeToken(jwtToken);
+        }
     }
 }

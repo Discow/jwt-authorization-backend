@@ -4,6 +4,7 @@ import com.example.backend.domain.vo.response.RestBean;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
  * 全局异常处理器
@@ -18,6 +19,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AuthorizationDeniedException.class)
     public RestBean<String> authorizationDeniedException(Exception e) {
         return RestBean.failure(403, e.getMessage());
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public RestBean<String> noResourceFoundException(Exception e) {
+        return RestBean.failure(404, e.getMessage());
     }
 
     @ExceptionHandler(Exception.class)

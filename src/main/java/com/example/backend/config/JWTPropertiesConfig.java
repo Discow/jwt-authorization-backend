@@ -11,7 +11,8 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "spring.jwt")
 @Data
-public class CustomPropertiesConfig {
+public class JWTPropertiesConfig {
     private String secret; //jwt签名密钥
-    private String expire; //jwt token过期时间（minute）
+    private String accessTokenExpire; //access token过期时间（minute）
+    private String refreshTokenExpire; //refresh token过期时间（minute）
 }

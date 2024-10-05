@@ -19,6 +19,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+import static com.example.backend.util.JWTUtil.TokenType;
+
 /**
  * 用于解析并验证JWT令牌
  */
@@ -31,11 +33,11 @@ public class JWTFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         response.setContentType("application/json;charset=utf-8");
-        String jwtToken = request.getHeader("Authorization");
+        String accessToken = request.getHeader("Authorization");
         //如果存在JWT token则解析并验证令牌
-        if (StringUtils.hasText(jwtToken)) {
+        if (StringUtils.hasText(accessToken)) {
             try {
-                DecodedJWT decodedJWT = jwtUtil.verifyToken(jwtToken); //验证失败将会抛出异常
+                DecodedJWT decodedJWT = jwtUtil.verifyToken(accessToken, TokenType.ACCESS); //验证失败将会抛出异常
                 String username = decodedJWT.getClaim("uname").asString();
                 String role = decodedJWT.getClaim("role").asString();
                 //将验证信息放入SecurityContextHolder

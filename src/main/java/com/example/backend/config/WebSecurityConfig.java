@@ -77,7 +77,7 @@ public class WebSecurityConfig {
 
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         response.setContentType("application/json;charset=utf-8");
-        response.getWriter().write(RestBean.success(authorizeService.getToken(authentication.getName())).asJsonString());
+        response.getWriter().write(RestBean.success(authorizeService.getNewToken(authentication.getName())).asJsonString());
     }
 
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException {

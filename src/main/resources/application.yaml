@@ -10,7 +10,8 @@ spring:
 
   jwt:
     secret: ${JWT_SECRET}
-    expire: 60
+    access-token-expire: 60 #minute
+    refresh-token-expire: 20160 #minute
 
   data:
     redis:

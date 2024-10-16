@@ -54,7 +54,6 @@ public class WebSecurityConfig {
                 .logout(conf -> {
                     conf
                             .logoutUrl("/api/auth/logout")
-                            .addLogoutHandler(this::logoutHandler)
                             .logoutSuccessHandler(this::onLogoutSuccess);
                 })
                 //异常处理
@@ -87,14 +86,20 @@ public class WebSecurityConfig {
 
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         response.setContentType("application/json;charset=utf-8");
-        response.getWriter().write(RestBean.success().asJsonString());
-    }
 
-    public void logoutHandler(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         //吊销JWT令牌
-        String jwtToken = request.getHeader("Authorization");
-        if (StringUtils.hasText(jwtToken)) {
-            jwtUtil.revokeToken(jwtToken);
+        String accessToken = request.getHeader("Authorization");
+        String refreshToken = request.getParameter("refreshToken");
+        try {
+            if (StringUtils.hasText(accessToken) && StringUtils.hasText(refreshToken)) {
+                jwtUtil.revokeToken(accessToken);
+                jwtUtil.revokeToken(refreshToken);
+                response.getWriter().write(RestBean.success().asJsonString());
+            } else {
+                response.getWriter().write(RestBean.failure(400, "The token is null.").asJsonString());
+            }
+        } catch (Exception e) {
+            response.getWriter().write(RestBean.failure(400, "invalid token").asJsonString());
         }
     }
 }

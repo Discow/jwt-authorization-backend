@@ -13,6 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -30,9 +31,18 @@ public class JWTFilter extends OncePerRequestFilter {
     @Resource
     JWTUtil jwtUtil;
 
+    private final AntPathRequestMatcher antPathRequestMatcher = new AntPathRequestMatcher("/api/auth/**");
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         response.setContentType("application/json;charset=utf-8");
+
+        // 放行验证相关的api
+        if (antPathRequestMatcher.matches(request)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String accessToken = request.getHeader("Authorization");
         //如果存在JWT token则解析并验证令牌
         if (StringUtils.hasText(accessToken)) {
